@@ -6,23 +6,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
-
-func mustInt(s string) int {
-	i, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-
-	return int(i)
-}
 
 func parseRange(s string) [2]int {
 	r := strings.Split(s, "-")
 
-	return [2]int{mustInt(r[0]), mustInt(r[1])}
+	return [2]int{util.MustInt(r[0]), util.MustInt(r[1])}
 }
 
 func Day4() error {

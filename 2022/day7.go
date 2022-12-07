@@ -10,9 +10,6 @@ import (
 	"strings"
 )
 
-const typeFile = 1
-const typeDir = 2
-
 type node interface{}
 
 type fileNode struct {

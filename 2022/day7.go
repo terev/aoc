@@ -18,7 +18,6 @@ type fileNode struct {
 }
 
 type dirNode struct {
-	prevDir  *dirNode
 	name     string
 	children []node
 }
@@ -79,6 +78,7 @@ func Day7() error {
 
 	root := &dirNode{name: "/"}
 	curDir := root
+	dirStack := []*dirNode{root}
 	scanner := bufio.NewScanner(f)
 
 scan:
@@ -94,19 +94,21 @@ scan:
 				case "/":
 					curDir = root
 				case "..":
-					curDir = curDir.prevDir
+					curDir = dirStack[len(dirStack)-1]
+					dirStack = dirStack[:len(dirStack)-1]
 				default:
 					for _, node := range curDir.children {
 						if dir, ok := node.(*dirNode); ok && dir.name == tokens[2] {
+							dirStack = append(dirStack, curDir)
 							curDir = dir
 							continue scan
 						}
 					}
 					newNode := &dirNode{
-						prevDir: curDir,
-						name:    tokens[2],
+						name: tokens[2],
 					}
 					curDir.children = append(curDir.children, newNode)
+					dirStack = append(dirStack, curDir)
 					curDir = newNode
 				}
 			case "ls":
@@ -120,8 +122,7 @@ scan:
 				}
 			}
 			curDir.children = append(curDir.children, &dirNode{
-				prevDir: curDir,
-				name:    tokens[1],
+				name: tokens[1],
 			})
 		default:
 			for _, node := range curDir.children {

@@ -79,9 +79,9 @@ func simulateKnots(nKnots int) (int, error) {
 				}
 
 				if j == nKnots-2 {
-					if _, exists := uniquePositions[knots[j+1]]; !exists {
+					if _, exists := uniquePositions[*tail]; !exists {
 						totalPositions++
-						uniquePositions[knots[j+1]] = struct{}{}
+						uniquePositions[*tail] = struct{}{}
 					}
 				}
 			}

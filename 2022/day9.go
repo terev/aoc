@@ -9,13 +9,6 @@ import (
 	"strings"
 )
 
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
 func sign(a int) int {
 	if a == 0 {
 		return 0
@@ -69,11 +62,11 @@ func simulateKnots(nKnots int) (int, error) {
 					head[1] += movementVector[1]
 				}
 
-				if head[1] == tail[1] && abs(head[0]-tail[0]) > 1 {
+				if head[1] == tail[1] && util.Abs(head[0]-tail[0]) > 1 {
 					tail[0] += sign(head[0] - tail[0])
-				} else if head[0] == tail[0] && abs(head[1]-tail[1]) > 1 {
+				} else if head[0] == tail[0] && util.Abs(head[1]-tail[1]) > 1 {
 					tail[1] += sign(head[1] - tail[1])
-				} else if head[0] != tail[0] && head[1] != tail[1] && (abs(head[0]-tail[0]) > 1 || abs(head[1]-tail[1]) > 1) {
+				} else if head[0] != tail[0] && head[1] != tail[1] && (util.Abs(head[0]-tail[0]) > 1 || util.Abs(head[1]-tail[1]) > 1) {
 					tail[0] += sign(head[0] - tail[0])
 					tail[1] += sign(head[1] - tail[1])
 				}

@@ -3,6 +3,7 @@ module aoc
 go 1.19
 
 require (
+	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.6.1
 	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
 )

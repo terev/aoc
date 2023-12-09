@@ -1,10 +1,12 @@
 package util
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"

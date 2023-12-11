@@ -52,6 +52,7 @@ humidity-to-location map:
 
 	f, err := os.Open(filepath.Join(util.Cwd(), "day5.txt"))
 	require.NoError(t, err)
+	defer f.Close()
 
 	p1, p2, err = Day5(f)
 	require.NoError(t, err)

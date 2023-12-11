@@ -12,6 +12,7 @@ import (
 func TestDay1(t *testing.T) {
 	f, err := os.Open(filepath.Join(util.Cwd(), "day1.txt"))
 	require.NoError(t, err)
+	defer f.Close()
 
 	p1, p2, err := Day1(f)
 	require.NoError(t, err)

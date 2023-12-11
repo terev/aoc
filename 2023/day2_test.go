@@ -25,6 +25,8 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green`
 
 	f, err := os.Open(filepath.Join(util.Cwd(), "day2.txt"))
 	require.NoError(t, err)
+	defer f.Close()
+
 	p1, p2, err = Day2(f)
 	require.NoError(t, err)
 	fmt.Println(p1)

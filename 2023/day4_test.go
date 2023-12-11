@@ -25,6 +25,8 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11`
 
 	f, err := os.Open(filepath.Join(util.Cwd(), "day4.txt"))
 	require.NoError(t, err)
+	defer f.Close()
+
 	p1, p2, err = Day4(f)
 	require.NoError(t, err)
 	fmt.Println(p1)

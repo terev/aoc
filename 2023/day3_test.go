@@ -29,6 +29,8 @@ func TestDay3(t *testing.T) {
 
 	f, err := os.Open(filepath.Join(util.Cwd(), "day3.txt"))
 	require.NoError(t, err)
+	defer f.Close()
+
 	p1, p2, err = Day3(f)
 	fmt.Println(p1)
 	fmt.Println(p2)

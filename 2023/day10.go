@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/util"
 	"bufio"
 	"golang.org/x/exp/slices"
 	"io"
@@ -91,43 +92,32 @@ func Day10(r io.Reader) (int, int, error) {
 		}
 	}
 
-	pathLookup := make(map[[2]int]struct{})
+	var corners [][2]int = [][2]int{maxPath[0]}
 
-	for _, pos := range maxPath {
-		pathLookup[pos] = struct{}{}
-	}
-
-	toVisit = nil
-	for i := 0; i < len(grid); i++ {
-		if _, exists := pathLookup[[2]int{i, 0}]; !exists {
-			toVisit = append(toVisit, node{pos: [2]int{i, 0}})
-		}
-
-		if _, exists := pathLookup[[2]int{i, len(grid[i]) - 1}]; !exists {
-			toVisit = append(toVisit, node{pos: [2]int{i, len(grid[i]) - 1}})
+	for i := 0; i < len(maxPath); i++ {
+		if slices.Contains([]byte{'7', 'L', 'J', 'F'}, grid[maxPath[i][0]][maxPath[i][1]]) {
+			corners = append(corners, maxPath[i])
 		}
 	}
 
-	for i := 0; i < len(grid[0]); i++ {
-		if _, exists := pathLookup[[2]int{0, i}]; !exists {
-			toVisit = append(toVisit, node{pos: [2]int{0, i}})
-		}
+	corners = append(corners, maxPath[0])
 
-		if _, exists := pathLookup[[2]int{len(grid) - 1, i}]; !exists {
-			toVisit = append(toVisit, node{pos: [2]int{len(grid) - 1, i}})
-		}
+	// Shoelace formula
+	var sum int
+	for i := 0; i < len(corners); i++ {
+		sum += (len(grid) - corners[i][0]) * (corners[circularIndex(len(corners), i-1)][1] - corners[circularIndex(len(corners), i+1)][1])
 	}
 
-	var outsideLoop int
-	visited = make(map[[2]int]struct{})
-	for len(toVisit) > 0 {
-		cur := toVisit[0]
-		toVisit = slices.Delete(toVisit, 0, 1)
-		if _, ok := visited[cur.pos]; ok {
-			continue
-		}
-		visited[cur.pos] = struct{}{}
+	return maxLoop / 2, (util.Abs(sum)-maxLoop)/2 + 1, nil
+}
+
+func circularIndex(size int, i int) int {
+	if i < 0 {
+		return size + i
+	}
+	if i >= size {
+		return i % size
 	}
 
-	return maxLoop / 2, len(grid)*len(grid[0]) - maxLoop, nil
+	return i
 }

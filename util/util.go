@@ -75,3 +75,16 @@ func GetInput(year int, day int) ([]byte, error) {
 
 	return bytes, nil
 }
+
+func TransposeMatrix[S ~[][]E, E any](s S) S {
+	var transposed [][]E
+	for i := 0; i < len(s[0]); i++ {
+		var row []E
+		for j := 0; j < len(s); j++ {
+			row = append(row, s[j][i])
+		}
+		transposed = append(transposed, row)
+	}
+
+	return transposed
+}

@@ -96,7 +96,7 @@ func findReflectionsWithSmudges(image [][]byte) int {
 				if !withSmudge {
 					continue
 				}
-				// if already smudged disregard point because there can only be one
+				// if already smudged disregard position, because there can only be one smudge on the entire mirror
 				if candidatePoint.smudged {
 					potentialReflectionPoints = slices.Delete(potentialReflectionPoints, j, j+1)
 					continue

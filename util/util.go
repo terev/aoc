@@ -88,3 +88,24 @@ func TransposeMatrix[S ~[][]E, E any](s S) S {
 
 	return transposed
 }
+
+// calculates area of polygon using shoelace formula
+func AreaOfPolygon(corners [][2]int) int {
+	var sum int
+	for i := 0; i < len(corners); i++ {
+		sum += corners[i][0] * (corners[CircularIndex(len(corners), i-1)][1] - corners[CircularIndex(len(corners), i+1)][1])
+	}
+
+	return sum
+}
+
+func CircularIndex(size int, i int) int {
+	if i < 0 {
+		return size + i
+	}
+	if i >= size {
+		return i % size
+	}
+
+	return i
+}

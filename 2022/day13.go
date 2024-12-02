@@ -34,14 +34,6 @@ func tokenizeList(s string) []string {
 	return list
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-
-	return b
-}
-
 func comparePackets(p1 string, p2 string) (bool, bool) {
 	p1IsList := strings.HasPrefix(p1, "[")
 	p2IsList := strings.HasPrefix(p2, "[")

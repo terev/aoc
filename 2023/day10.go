@@ -92,7 +92,7 @@ func Day10(r io.Reader) (int, int, error) {
 		}
 	}
 
-	var corners [][2]int = [][2]int{maxPath[0]}
+	var corners = [][2]int{maxPath[0]}
 
 	for i := 0; i < len(maxPath); i++ {
 		if slices.Contains([]byte{'7', 'L', 'J', 'F'}, grid[maxPath[i][0]][maxPath[i][1]]) {

@@ -16,6 +16,7 @@ func Day2(r io.Reader) error {
 	var safe int
 	var safeWithBad int
 
+read:
 	for scanner.Scan() {
 		levelsRaw := strings.Fields(scanner.Text())
 		if len(levelsRaw) == 0 {
@@ -28,22 +29,17 @@ func Day2(r io.Reader) error {
 			continue
 		}
 
-		s := slices.Delete(slices.Clone(levelsRaw), 0, 1)
-		if _, valid := validateReport(s); valid {
-			safeWithBad++
-			continue
-		}
+		for _, inc := range []int{-1, 0, 1} {
+			ri := initialError + inc
+			if ri < 0 || ri > len(levelsRaw) {
+				continue
+			}
 
-		s = slices.Delete(slices.Clone(levelsRaw), initialError, initialError+1)
-		if _, valid := validateReport(s); valid {
-			safeWithBad++
-			continue
-		}
-
-		s = slices.Delete(slices.Clone(levelsRaw), initialError-1, initialError)
-		if _, valid := validateReport(s); valid {
-			safeWithBad++
-			continue
+			s := slices.Delete(slices.Clone(levelsRaw), ri, ri+1)
+			if _, valid := validateReport(s); valid {
+				safeWithBad++
+				continue read
+			}
 		}
 	}
 
@@ -69,10 +65,10 @@ func validateReport(report []string) (int, bool) {
 		sign := diff < 0
 
 		if diff == 0 || util.Abs(diff) > 3 {
-			return i, false
+			return i - 1, false
 		}
 		if asc != nil && sign != *asc {
-			return i, false
+			return i - 1, false
 		}
 
 		*prev = level

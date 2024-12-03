@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"strconv"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -29,11 +28,7 @@ func Day1(r io.ReadCloser) error {
 		}
 
 		for i, c := range cols {
-			n, err := strconv.ParseInt(c, 10, 64)
-			if err != nil {
-				return err
-			}
-			ni := int(n)
+			ni := util.MustInt(c)
 
 			if i == 1 {
 				tally[ni]++

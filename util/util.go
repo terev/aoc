@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"unique"
 )
 
 func Cwd() string {
@@ -108,4 +109,14 @@ func CircularIndex(size int, i int) int {
 	}
 
 	return i
+}
+
+func UniqueSlice[T comparable, S ~[]T](s S) []unique.Handle[T] {
+	var u []unique.Handle[T]
+
+	for _, se := range s {
+		u = append(u, unique.Make(se))
+	}
+
+	return u
 }

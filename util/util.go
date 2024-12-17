@@ -95,21 +95,19 @@ func TransposeMatrix[S ~[][]E, E any](s S) S {
 func AreaOfPolygon(corners [][2]int) int {
 	var sum int
 	for i := 0; i < len(corners); i++ {
-		sum += corners[i][0] * (corners[CircularIndex(len(corners), i-1)][1] - corners[CircularIndex(len(corners), i+1)][1])
+		sum += corners[i][0] * (corners[CircularIndex(i-1, len(corners))][1] - corners[CircularIndex(i+1, len(corners))][1])
 	}
 
 	return sum
 }
 
-func CircularIndex(size int, i int) int {
+func CircularIndex(i int, size int) int {
 	if i < 0 {
-		return size + i
+		for i < 0 {
+			i += size
+		}
 	}
-	if i >= size {
-		return i % size
-	}
-
-	return i
+	return i % size
 }
 
 func UniqueSlice[T comparable, S ~[]T](s S) []unique.Handle[T] {
@@ -130,4 +128,11 @@ func IntersectSlices[S ~[]E, E comparable](a S, b S) S {
 		}
 	}
 	return r
+}
+
+func BoolToByte(b bool) uint8 {
+	if b {
+		return 1
+	}
+	return 0
 }

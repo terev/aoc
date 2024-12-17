@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"unique"
 )
@@ -119,4 +120,14 @@ func UniqueSlice[T comparable, S ~[]T](s S) []unique.Handle[T] {
 	}
 
 	return u
+}
+
+func IntersectSlices[S ~[]E, E comparable](a S, b S) S {
+	var r S
+	for _, e := range a {
+		if slices.Contains(b, e) {
+			r = append(r, e)
+		}
+	}
+	return r
 }

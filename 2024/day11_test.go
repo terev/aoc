@@ -38,6 +38,7 @@ func TestDay11(t *testing.T) {
 
 	err = Day11(f, 25)
 	require.NoError(t, err)
+
 	_, err = f.Seek(io.SeekStart, 0)
 	require.NoError(t, err)
 

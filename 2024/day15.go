@@ -218,35 +218,9 @@ func transformToDoubleWideTiles(tm tileMap) tileMap {
 	return result
 }
 
-func moveBoxTiles(tm *tileMap, boxPos [2]int, movementVector [2]int) bool {
+func moveBoxTiles(tm *tileMap, startBoxPos [2]int, movementVector [2]int) bool {
 	upDown := movementVector[0] != 0
-	var boxPositions [][2]int
-foundEmpty:
-	for {
-		tile, ok := tm.Lookup[boxPos]
-		if !ok {
-			tile = emptyTile
-		}
-		switch tile {
-		case wallTile:
-			return false
-		case emptyTile:
-			break foundEmpty
-		case doubleWideBoxLeftTile, doubleWideBoxRightTile:
-			if upDown {
-				return moveDoubleWideBoxTilesUpDown(tm, boxPos, movementVector[0])
-			}
-		}
 
-		boxPositions = append(boxPositions, boxPos)
-		boxPos = [2]int{boxPos[0] + movementVector[0], boxPos[1] + movementVector[1]}
-	}
-	tm.MoveTiles(boxPositions, movementVector)
-	return true
-}
-
-// dir - -1 for up, 1 for down
-func moveDoubleWideBoxTilesUpDown(tm *tileMap, startBoxPos [2]int, dir int) bool {
 	var boxTilePositions [][2]int
 
 	horizontalSearchDeltas := map[rune]int{doubleWideBoxLeftTile: 1, doubleWideBoxRightTile: -1}
@@ -270,17 +244,22 @@ func moveDoubleWideBoxTilesUpDown(tm *tileMap, startBoxPos [2]int, dir int) bool
 			case wallTile:
 				return false
 			case emptyTile:
+			case boxTile:
+				boxTilePositions = append(boxTilePositions, tilePos)
+				nextSearch = append(nextSearch, [2]int{tilePos[0] + movementVector[0], tilePos[1] + movementVector[1]})
 			case doubleWideBoxLeftTile, doubleWideBoxRightTile:
 				boxTilePositions = append(boxTilePositions, tilePos)
-				newRow := tilePos[0] + dir
-				newCol := tilePos[1] + horizontalSearchDeltas[tile]
-				// Add other box tile and space above or below current tile to search.
-				nextSearch = append(nextSearch, [2]int{tilePos[0], newCol}, [2]int{newRow, tilePos[1]})
+				nextSearch = append(nextSearch, [2]int{tilePos[0] + movementVector[0], tilePos[1] + movementVector[1]})
+				if !upDown {
+					continue
+				}
+				// Add other box tile to search space.
+				nextSearch = append(nextSearch, [2]int{tilePos[0], tilePos[1] + horizontalSearchDeltas[tile]})
 			}
 		}
 
 		toSearch = nextSearch
 	}
-	tm.MoveTiles(boxTilePositions, [2]int{dir, 0})
+	tm.MoveTiles(boxTilePositions, movementVector)
 	return true
 }

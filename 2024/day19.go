@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"maps"
 	"slices"
 	"strings"
 
@@ -27,90 +28,89 @@ func Day19(in io.Reader) error {
 		designsToValidate = append(designsToValidate, line)
 	}
 
-	slices.Sort(patterns)
-
 	var patternTrie util.Trie
 	for i := 0; i < len(patterns); i++ {
 		patternTrie.Insert(patterns[i])
 	}
 
 	var possibleDesigns int
+	var totalWaysToMakeDesigns int
 	for i := 0; i < len(designsToValidate); i++ {
-		if canDesignBeMade(designsToValidate[i], patternTrie) {
+		waysToMakeDesign := canDesignBeMade(designsToValidate[i], patternTrie)
+		if waysToMakeDesign > 0 {
 			possibleDesigns++
-			fmt.Println(designsToValidate[i])
+			totalWaysToMakeDesigns += waysToMakeDesign
+			fmt.Println(waysToMakeDesign, designsToValidate[i])
 		}
 	}
 
-	fmt.Println(possibleDesigns)
+	fmt.Println("Possible Designs:", possibleDesigns)
+	fmt.Println("Possible Configurations:", totalWaysToMakeDesigns)
 	return nil
 }
 
-func canDesignBeMade(design string, patternTrie util.Trie) bool {
-	i := 0
+type prefixSearchStack struct {
+	prefixes  []string
+	startIdx  int
+	prefixIdx int
+}
 
-	prefixStack := [][]string{patternTrie.Prefixes(design)}
-	slices.Reverse(prefixStack[0])
+func canDesignBeMade(design string, patternTrie util.Trie) int {
 	stackPointer := 0
-	prefixPointers := []int{0}
-	iStack := []int{i}
+	searchStack := []prefixSearchStack{{
+		prefixes: patternTrie.Prefixes(design),
+	}}
 
-	for stackPointer >= 0 && iStack[stackPointer] < len(design) && len(prefixStack) > 0 && len(prefixStack[0]) > 0 {
-		temp := stackPointer
-		for stackPointer >= 0 && prefixPointers[stackPointer] >= len(prefixStack[stackPointer]) {
-			prefixStack = slices.Delete(prefixStack, stackPointer, stackPointer+1)
-			prefixPointers = slices.Delete(prefixPointers, stackPointer, stackPointer+1)
-			iStack = slices.Delete(iStack, stackPointer, stackPointer+1)
+	designLen := len(design)
+
+	// [idx] -> count
+	validatedPrefixes := map[int]int{}
+
+	for stackPointer >= 0 {
+		stack := &searchStack[stackPointer]
+		if stack.prefixIdx >= len(stack.prefixes) {
+			if stackPointer > 0 {
+				// Propagate count to previous stack.
+				validatedPrefixes[searchStack[stackPointer-1].startIdx] += validatedPrefixes[stack.startIdx]
+			}
+			searchStack = slices.Delete(searchStack, stackPointer, stackPointer+1)
 			stackPointer--
-		}
-		if temp != stackPointer {
 			continue
 		}
 
-		i = iStack[stackPointer]
-		nextPrefix := prefixStack[stackPointer][prefixPointers[stackPointer]]
-		prefixPointers[stackPointer]++
-		if design[:i]+nextPrefix == design {
-			return true
+		nextPrefix := stack.prefixes[stack.prefixIdx]
+		stack.prefixIdx++
+
+		nextI := stack.startIdx + len(nextPrefix)
+
+		if nextI == designLen {
+			validatedPrefixes[stack.startIdx]++
+			continue
 		}
 
-		nextPrefixes := patternTrie.Prefixes(design[i+len(nextPrefix):])
-		nextPrefixes = slices.DeleteFunc(nextPrefixes, func(s string) bool {
-			return i+len(nextPrefix)+len(s) > len(design)
-		})
+		if totalFromPrefix, ok := validatedPrefixes[nextI]; ok {
+			validatedPrefixes[stack.startIdx] += totalFromPrefix
+			continue
+		}
+
+		nextPrefixes := slices.DeleteFunc(patternTrie.Prefixes(design[nextI:]),
+			func(s string) bool {
+				return nextI+len(s) > designLen
+			})
 
 		if len(nextPrefixes) > 0 {
-			prefixStack = append(prefixStack, nextPrefixes)
-			prefixPointers = append(prefixPointers, 0)
-			iStack = append(iStack, i+len(nextPrefix))
+			searchStack = append(searchStack, prefixSearchStack{
+				prefixes: nextPrefixes,
+				startIdx: nextI,
+			})
 			stackPointer++
+			continue
 		}
 	}
-	return i >= len(design)
-}
 
-func canMakeDesign2(design string, patternTrie util.Trie) bool {
-	partsToMask := []string{design}
-	for len(partsToMask) > 0 {
-		var newParts []string
-		for _, part := range partsToMask {
-			longest := ""
-			for i := 0; i < len(part); i++ {
-				l := patternTrie.LongestPrefix(part[i:])
-				if len(l) > len(longest) {
-					longest = l
-				}
-			}
-			if longest == "" {
-				return false
-			}
-			for _, remainingPart := range strings.Split(part, longest) {
-				if len(remainingPart) > 0 {
-					newParts = append(newParts, remainingPart)
-				}
-			}
-		}
-		partsToMask = newParts
+	if len(validatedPrefixes) == 0 {
+		return 0
 	}
-	return true
+
+	return slices.Max(slices.Collect(maps.Values(validatedPrefixes)))
 }

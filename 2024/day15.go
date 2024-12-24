@@ -141,6 +141,37 @@ func (tm *tileMap) WriteTo(w io.Writer) (n int64, err error) {
 	return io.Copy(w, strings.NewReader(buf.String()))
 }
 
+func (tm *tileMap) Clear() {
+	for i := 0; i < tm.Height; i++ {
+		for j := 0; j < tm.Width; j++ {
+			pos := [2]int{i, j}
+			tile, ok := tm.Lookup[pos]
+			if ok && tile != tm.EmptyTile {
+				delete(tm.TypeLocations, tile)
+			}
+			tm.SetTile(pos, tm.EmptyTile)
+		}
+	}
+}
+
+func (tm *tileMap) SetTile(pos [2]int, tile rune) {
+	if tm.Lookup == nil {
+		tm.Lookup = map[[2]int]rune{}
+	}
+	prevTile, hasPrev := tm.Lookup[pos]
+	tm.Lookup[pos] = tile
+	if tm.TypeLocations == nil {
+		tm.TypeLocations = map[rune]map[[2]int]struct{}{}
+	}
+	if _, ok := tm.TypeLocations[tile]; !ok {
+		tm.TypeLocations[tile] = map[[2]int]struct{}{}
+	}
+	if hasPrev {
+		delete(tm.TypeLocations[prevTile], pos)
+	}
+	tm.TypeLocations[tile][pos] = struct{}{}
+}
+
 func readTileMap(scanner *bufio.Scanner) (tileMap, error) {
 	result := tileMap{
 		EmptyTile:     emptyTile,
